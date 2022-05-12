@@ -26,6 +26,9 @@ import {
   createUserDocumentFromAuth,
 } from '../utils/firebase.utils';
 
+import { checkPasswordStrength } from '../utils/passwordChecker.utils';
+import ReCAPTCHA from 'react-google-recaptcha';
+
 const defaultFormFields = {
   email: '',
   password: '',
@@ -38,6 +41,7 @@ export default function SignupCard() {
   const [passwordConfirmed, setPasswordConfirmed] = useState(false);
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password, confirmPassword } = formFields;
+
   let strength = {
     eightCharacter: false,
     upperCase: false,
@@ -88,67 +92,6 @@ export default function SignupCard() {
         console.log('user creation encountered an error', error);
       }
     }
-  };
-
-  const checkPasswordStrength = password => {
-    //checking for 8 character count
-    const eightCharactePoints = checkRuleStrength(
-      password,
-      /^.{8,}/,
-      'eightCharacters'
-    );
-    // console.log(eightCharactePoints);
-
-    //checking for upercase
-    const upperCasePoints = checkRuleStrength(password, /[A-Z]/g, 'upperCase');
-    // console.log(upperCasePoints);
-
-    //checking for lowerCase
-    const lowerCasePoints = checkRuleStrength(password, /[a-z]/g, 'lowerCase');
-    // console.log(lowerCasePoints);
-
-    //checking for digits
-    const digitPoints = checkRuleStrength(password, /[0-9]/g, 'digits');
-    // console.log(digitPoints);
-
-    //checking for special characters
-    const specialCharacter = checkRuleStrength(
-      password,
-      /[^0-9a-zA-Z\s]/g,
-      'specialCharacter'
-    );
-    // console.log(uniqueCharacterPoints);
-
-    const totalPoints =
-      eightCharactePoints +
-      upperCasePoints +
-      digitPoints +
-      lowerCasePoints +
-      specialCharacter;
-    console.log(totalPoints);
-
-    return {
-      eightCharacter: eightCharactePoints > 0 ? true : false,
-      upperCase: upperCasePoints > 0 ? true : false,
-      digit: digitPoints > 0 ? true : false,
-      lowerCase: lowerCasePoints > 0 ? true : false,
-      specialCharacter: specialCharacter > 0 ? true : false,
-      totalPoints: totalPoints,
-    };
-  };
-
-  const checkRuleStrength = (password, regex, type) => {
-    const matches = password.match(regex) || [];
-    const points = {
-      eightCharacters: 10,
-      lowerCase: 5,
-      upperCase: 5,
-      digits: 5,
-      specialCharacter: 10,
-      uniqueCharacters: 5,
-    };
-    console.log(type, ':', matches.length);
-    return points[type] * matches.length;
   };
 
   if (password.length > 0) {
@@ -224,50 +167,6 @@ export default function SignupCard() {
               }
             />
 
-            <Stack pt={0}>
-              <Text fontSize={'xs'} align={'center'}>
-                8+ Characters{' '}
-                {strength.eightCharacter === true ? (
-                  <CheckCircleIcon color="green.500" />
-                ) : (
-                  <WarningIcon color="red.500" />
-                )}
-              </Text>
-              <Text fontSize={'xs'} align={'center'}>
-                Uppercase letters{' '}
-                {strength.upperCase === true ? (
-                  <CheckCircleIcon color="green.500" />
-                ) : (
-                  <WarningIcon color="red.500" />
-                )}
-              </Text>
-              <Text fontSize={'xs'} align={'center'}>
-                Lowercase letters{' '}
-                {strength.lowerCase === true ? (
-                  <CheckCircleIcon color="green.500" />
-                ) : (
-                  <WarningIcon color="red.500" />
-                )}
-              </Text>
-
-              <Text fontSize={'xs'} align={'center'}>
-                Special Character{' '}
-                {strength.specialCharacter === true ? (
-                  <CheckCircleIcon color="green.500" />
-                ) : (
-                  <WarningIcon color="red.500" />
-                )}
-              </Text>
-              <Text fontSize={'xs'} align={'center'}>
-                Contains digits{' '}
-                {strength.digit === true ? (
-                  <CheckCircleIcon color="green.500" />
-                ) : (
-                  <WarningIcon color="red.500" />
-                )}
-              </Text>
-            </Stack>
-
             <FormControl id="confirmPassword" isRequired>
               <FormLabel> Confirm Password</FormLabel>
               <InputGroup>
@@ -301,6 +200,50 @@ export default function SignupCard() {
               ''
             )}
 
+            <Stack>
+              <Text fontSize={'xs'}>
+                8+ Characters{' '}
+                {strength.eightCharacter === true ? (
+                  <CheckCircleIcon color="green.500" />
+                ) : (
+                  <WarningIcon color="red.500" />
+                )}
+              </Text>
+              <Text fontSize={'xs'}>
+                Uppercase letters{' '}
+                {strength.upperCase === true ? (
+                  <CheckCircleIcon color="green.500" />
+                ) : (
+                  <WarningIcon color="red.500" />
+                )}
+              </Text>
+              <Text fontSize={'xs'}>
+                Lowercase letters{' '}
+                {strength.lowerCase === true ? (
+                  <CheckCircleIcon color="green.500" />
+                ) : (
+                  <WarningIcon color="red.500" />
+                )}
+              </Text>
+
+              <Text fontSize={'xs'}>
+                Special Character{' '}
+                {strength.specialCharacter === true ? (
+                  <CheckCircleIcon color="green.500" />
+                ) : (
+                  <WarningIcon color="red.500" />
+                )}
+              </Text>
+              <Text fontSize={'xs'}>
+                Contains digits{' '}
+                {strength.digit === true ? (
+                  <CheckCircleIcon color="green.500" />
+                ) : (
+                  <WarningIcon color="red.500" />
+                )}
+              </Text>
+            </Stack>
+
             <Stack spacing={10} pt={2}>
               <Button
                 loadingText="Submitting"
@@ -314,11 +257,13 @@ export default function SignupCard() {
                 Sign up
               </Button>
             </Stack>
-            <Stack pt={6}>
-              {/* This is where the Captcha will go */}
-              {/* <Text align={'center'}>
-                Already a user? <Link color={'blue.400'}>Login</Link>
-              </Text> */}
+
+            <Stack>
+              <ReCAPTCHA
+                sitekey="6LcgtOIfAAAAAPKY4tPJouA-7ujrn7IHYJNvuOk6"
+                onChange={() => console.log('captcha completed')}
+                type="image"
+              />
             </Stack>
           </Stack>
         </Box>
