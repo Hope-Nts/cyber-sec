@@ -38,8 +38,10 @@ const defaultFormFields = {
 export default function SignupCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordConfirmed, setPasswordConfirmed] = useState(false);
+  const [showPasswordMatch, setShowPasswordMatch] = useState(false);
   const [formFields, setFormFields] = useState(defaultFormFields);
+  const [isCaptchaVerified, setCaptchaVerified] = useState(false);
+
   const { email, password, confirmPassword } = formFields;
 
   let strength = {
@@ -60,20 +62,40 @@ export default function SignupCard() {
     setFormFields(defaultFormFields);
   };
 
-  const checkPassword = () => {
-    if (password === confirmPassword) {
-      setPasswordConfirmed(true);
-    } else if (password !== confirmPassword) {
-      setPasswordConfirmed(false);
-    }
+  const verifyCaptcha = () => {
+    setCaptchaVerified(true);
+  };
+
+  const resetCaptcha = () => {
+    setCaptchaVerified(false);
   };
 
   //method that is called when we submit the form
   const handleSubmit = async event => {
     event.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert('passwords do not match');
+    if (
+      strength.eightCharacter === false ||
+      strength.upperCase === false ||
+      strength.digit === false ||
+      strength.lowerCase === false ||
+      strength.specialCharacter === false
+    ) {
+      alert(`All password rules must be satisfied`);
+      return;
+    }
+
+    if (password.length > 0 && password !== confirmPassword) {
+      setShowPasswordMatch(true);
+      return;
+    }
+
+    if (password === confirmPassword) {
+      setShowPasswordMatch(false);
+    }
+
+    if (!isCaptchaVerified) {
+      alert(`Verify you're human`);
       return;
     }
 
@@ -138,7 +160,7 @@ export default function SignupCard() {
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
-                  required
+                  required={true}
                   value={password}
                   onChange={handleInputChange}
                 />
@@ -192,7 +214,7 @@ export default function SignupCard() {
               </InputGroup>
             </FormControl>
 
-            {confirmPassword ? (
+            {showPasswordMatch ? (
               <Text fontSize={'sm'} color={'red.600'}>
                 Passwords do not match!
               </Text>
@@ -253,6 +275,7 @@ export default function SignupCard() {
                 _hover={{
                   bg: 'blue.500',
                 }}
+                onClick={handleSubmit}
               >
                 Sign up
               </Button>
@@ -261,8 +284,8 @@ export default function SignupCard() {
             <Stack>
               <ReCAPTCHA
                 sitekey="6LcgtOIfAAAAAPKY4tPJouA-7ujrn7IHYJNvuOk6"
-                onChange={() => console.log('captcha completed')}
-                type="image"
+                onChange={verifyCaptcha}
+                onExpired={resetCaptcha}
               />
             </Stack>
           </Stack>

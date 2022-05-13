@@ -33,7 +33,6 @@ export const checkPasswordStrength = password => {
     digitPoints +
     lowerCasePoints +
     specialCharacter;
-  console.log(totalPoints);
 
   return {
     eightCharacter: eightCharactePoints > 0 ? true : false,
@@ -55,6 +54,6 @@ const checkRuleStrength = (password, regex, type) => {
     specialCharacter: 10,
     uniqueCharacters: 5,
   };
-  console.log(type, ':', matches.length);
+
   return points[type] * matches.length;
 };

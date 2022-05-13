@@ -8,12 +8,13 @@ import {
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDDU4V-_QV3M8GyhC9SVieRTDM4dbiT0Yk',
-  authDomain: 'crwn-clothing-db-98d4d.firebaseapp.com',
-  projectId: 'crwn-clothing-db-98d4d',
-  storageBucket: 'crwn-clothing-db-98d4d.appspot.com',
-  messagingSenderId: '626766232035',
-  appId: '1:626766232035:web:506621582dab103a4d08d6',
+  apiKey: 'AIzaSyAljsg_JDZfcHMcBhlvSeCjEBBNIiNzmNI',
+  authDomain: 'cyber-assignment.firebaseapp.com',
+  projectId: 'cyber-assignment',
+  storageBucket: 'cyber-assignment.appspot.com',
+  messagingSenderId: '693806217599',
+  appId: '1:693806217599:web:c26912e7866395ee42c24a',
+  measurementId: 'G-7YZVSLJ0R6',
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
@@ -35,13 +36,13 @@ export const createUserDocumentFromAuth = async userAuth => {
   const userSnapshot = await getDoc(userDocRef);
 
   if (!userSnapshot.exists()) {
-    const { displayName, email } = userAuth;
+    const { email, password } = userAuth;
     const createdAt = new Date();
 
     try {
       await setDoc(userDocRef, {
-        displayName,
         email,
+        password,
         createdAt,
       });
     } catch (error) {
