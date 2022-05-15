@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^10.4.9",
     "@testing-library/user-event": "^12.8.3",
+    "crypto-js": "^4.1.1",
     "firebase": "^9.8.1",
     "framer-motion": "^4.1.17",
     "i": "^0.3.7",

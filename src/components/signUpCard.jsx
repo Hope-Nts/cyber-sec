@@ -20,17 +20,15 @@ import {
   CheckCircleIcon,
   WarningIcon,
 } from '@chakra-ui/icons';
+import { ColorModeSwitcher } from '../ColorModeSwitcher';
 
-import {
-  createAuthUserWithEmailAndPassword,
-  createUserDocumentFromAuth,
-} from '../utils/firebase.utils';
+import { signUpUser, checkIfUsernameExists } from '../utils/firebase.utils';
 
 import { checkPasswordStrength } from '../utils/passwordChecker.utils';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 const defaultFormFields = {
-  email: '',
+  username: '',
   password: '',
   confirmPassword: '',
 };
@@ -42,7 +40,7 @@ export default function SignupCard() {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const [isCaptchaVerified, setCaptchaVerified] = useState(false);
 
-  const { email, password, confirmPassword } = formFields;
+  const { username, password, confirmPassword } = formFields;
 
   let strength = {
     eightCharacter: false,
@@ -74,6 +72,7 @@ export default function SignupCard() {
   const handleSubmit = async event => {
     event.preventDefault();
 
+    //check if the password satifies all the strength rules
     if (
       strength.eightCharacter === false ||
       strength.upperCase === false ||
@@ -85,37 +84,38 @@ export default function SignupCard() {
       return;
     }
 
+    //check if the passwords do not match
     if (password.length > 0 && password !== confirmPassword) {
       setShowPasswordMatch(true);
       return;
     }
 
+    //check if the passwords match
     if (password === confirmPassword) {
       setShowPasswordMatch(false);
     }
 
+    //check the captch has been verified
     if (!isCaptchaVerified) {
       alert(`Verify you're human`);
       return;
     }
 
-    try {
-      const { user } = await createAuthUserWithEmailAndPassword(
-        email,
-        password
-      );
+    //check if the username exists
+    const exists = await checkIfUsernameExists(username);
 
-      await createUserDocumentFromAuth(user);
-      resetFormFields();
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Cannot create user, email already in use');
-      } else {
-        console.log('user creation encountered an error', error);
+    if (exists) {
+      alert('Username already exists');
+    } else {
+      try {
+        signUpUser({ username, password });
+      } catch (error) {
+        console.log(error);
       }
     }
   };
 
+  //check the password strength
   if (password.length > 0) {
     strength = checkPasswordStrength(password);
   }
@@ -134,6 +134,7 @@ export default function SignupCard() {
           </Heading>
           <Text fontSize={'lg'} color={'gray.600'}>
             Please Enter your details
+            <ColorModeSwitcher />
           </Text>
         </Stack>
         <Box
@@ -143,13 +144,13 @@ export default function SignupCard() {
           p={8}
         >
           <Stack spacing={4}>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email address</FormLabel>
+            <FormControl id="username" isRequired>
+              <FormLabel>Username</FormLabel>
               <Input
-                type="email"
-                name="email"
+                type="text"
+                name="username"
                 required
-                value={email}
+                value={username}
                 onChange={handleInputChange}
               />
             </FormControl>
