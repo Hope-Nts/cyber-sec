@@ -26,6 +26,7 @@ import { signUpUser, checkIfUsernameExists } from '../utils/firebase.utils';
 
 import { checkPasswordStrength } from '../utils/passwordChecker.utils';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { useNavigate } from 'react-router-dom';
 
 const defaultFormFields = {
   username: '',
@@ -39,7 +40,7 @@ export default function SignupCard() {
   const [showPasswordMatch, setShowPasswordMatch] = useState(false);
   const [formFields, setFormFields] = useState(defaultFormFields);
   const [isCaptchaVerified, setCaptchaVerified] = useState(false);
-
+  let navigate = useNavigate();
   const { username, password, confirmPassword } = formFields;
 
   let strength = {
@@ -108,7 +109,10 @@ export default function SignupCard() {
       alert('Username already exists');
     } else {
       try {
-        signUpUser({ username, password });
+        const doc = await signUpUser({ username, password });
+        if (doc) {
+          navigate('/home', { replace: true });
+        }
       } catch (error) {
         console.log(error);
       }

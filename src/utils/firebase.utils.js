@@ -46,7 +46,7 @@ export const signUpUser = async userData => {
       password: passwordHash,
       passwordChanges: 0,
     });
-    console.log('Document written with ID: ', docRef.id);
+    return docRef.id;
   } catch (e) {
     console.error('Error adding document: ', e);
   }
