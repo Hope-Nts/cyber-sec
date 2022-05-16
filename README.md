@@ -1,3 +1,14 @@
+## Cyber Security Assignment bi02hd(Hope Ntshonono)
+
+This project requires that you have the Node.js runtime(nodejs.org/)
+A code editor preferrably VsCode(https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiu57mO-OL3AhXKesAKHdPPBrAQjBB6BAgJEAE&url=https%3A%2F%2Fcode.visualstudio.com%2Fdownload&usg=AOvVaw11fc5fOXYIyxQh75jYLjXg)
+
+Open the application with VsCode, open the terminal and run
+
+### `npm install`
+
+upon completion see documentation below
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
